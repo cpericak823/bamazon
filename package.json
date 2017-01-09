@@ -1,0 +1,24 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "an application that uses node js and mysql to query and update a database similar to amazon",
+  "main": "bamazon.js",
+  "dependencies": {
+    "mysql": "^2.12.0",
+    "inquirer": "^2.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cpericak823/bamazon.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cpericak823/bamazon/issues"
+  },
+  "homepage": "https://github.com/cpericak823/bamazon#readme"
+}
