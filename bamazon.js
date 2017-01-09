@@ -17,8 +17,6 @@ connection.connect(function(err) {
     showDatabase();
     userPrompt();
 });
-
-
 //show database function
 function showDatabase() {
     connection.query("SELECT * FROM products", function(err, res) {
@@ -29,49 +27,71 @@ function showDatabase() {
         }
     });
 }
-
-
 //userprompt function to ask which item and quantity to buy
 function userPrompt() {
     inquirer.prompt([{
-            name: "item",
-            type: "input",
-            message: "What is the item ID you would like to buy?"
-        }, {
-            name: "quantity",
-            type: "input",
-            message: "What how much/many would you like to buy?"
-        }, {
-            type: "confirm",
-            message: "Are you sure:",
-            name: "confirm",
-            default: true
-        }])
-        //using a promise to wait for the user to return input, then query the database to show the data specific to that item
-        .then(function(quantityCheck) {
-            databaseQuery();
+        name: "item",
+        type: "input",
+        message: "What is the item ID you would like to buy?"
+    }, {
+        name: "quantity",
+        type: "input",
+        message: "What how much/many would you like to buy?"
+    }, {
+        type: "confirm",
+        message: "Are you sure:",
+        name: "confirm",
+        default: true
+    }])
 
-            //if the user input quantity is less than or equal to the stock_quantity of them item, log purchase and update the database with the new quantity
-            if (quantityCheck.quantity <= res[i].stock_quantity) {
-                console.log("Congratulations! You just purchased: " + quantityCheck.quantity + " " + res[i].item_name + " for: $" + (res[i].price * quantityCheck.quantity));
-                updateQuantity();
-            } else if (quantityCheck.quantity > res[i].stock_quantity) {
-                console.log("We're sorry, there is not enough of that item. What would you like to do?");
-                inquirer.prompt([{
+    //using a promise to wait for the user to return input, then query the database to show the data specific to that item
+    .then(function(quantityCheck) {
+        databaseQuery();
+
+        //if the user input quantity is less than or equal to the stock_quantity of them item, log purchase and update the database with the new quantity
+        if (quantityCheck.quantity <= res[i].stock_quantity) {
+            console.log("Congratulations! You just purchased: " + quantityCheck.quantity + " " + res[i].item_name + " for: $" + (res[i].price * quantityCheck.quantity));
+            updateQuantity();
+
+            //if the user quantity is more than the stock quantity, prompt for a new action
+        } else if (quantityCheck.quantity > res[i].stock_quantity) {
+            console.log("We're sorry, there is not enough of that item. What would you like to do?");
+            inquirer.prompt([{
                     name: "action",
                     type: "list",
                     message: "Would you like to buy less of this item, buy a different item, or leave the store?",
                     choices: ["buy less", "buy a different item", "leave store"]
-                }]).then(function(nextSteps) {
+                }])
+                //depending on which choice the user picks, provide options for each
+                .then(function(nextSteps) {
 
+                    //if the user wants to buy less, prompt them a new quantity
+                    if (nextSteps.action === "buy less") {
+                        inquirer.prompt([{
+                            name: "quantity",
+                            type: "input",
+                            message: "What how much/many would you like to buy?"
+                        }])
+
+                        //after taking the new quantity from the user, update the table
+                        .then(function(newPurchase) {
+                            updateQuantity();
+                        });
+                    } else if (nextSteps.action === "buy a different item") {
+                        userPrompt();
+                    } else {
+                        console.log("Thank you for shopping at Bamazon. Visit us again soon!");
+
+                        //exit the application
+                        return false;
+                    }
                 });
-            }
-        });
+        }
+    });
 }
 
 //query the database and check if there are enough quantities of the database
 function databaseQuery() {
-
     var quantityUpdate = connection.query("SELECT item_id,item_name,stock_quantity,price FROM products WHERE ?");
     connection.query(quantityUpdate, { item_id: quantityCheck.item }, function(err, res) {
         for (var i = 0; i < res.length; i++) {
@@ -92,9 +112,3 @@ function updateQuantity() {
 
     });
 }
-//if no:
-//console log there isn't enough of that item left
-//prompt what would you like to do: buy less, buy another item, or leave store
-//if buy less, prompt the quantity to buy, rerun buyItem(){};
-//else if buy another item, rerun userPrompt(){};
-//else leave store, console log (Thank You, Come again!);
