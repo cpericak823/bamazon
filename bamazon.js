@@ -36,7 +36,7 @@ function userPrompt() {
     }, {
         name: "quantity",
         type: "input",
-        message: "What how much/many would you like to buy?"
+        message: "How much/many would you like to buy?"
     }, {
         type: "confirm",
         message: "Are you sure:",
@@ -46,69 +46,86 @@ function userPrompt() {
 
     //using a promise to wait for the user to return input, then query the database to show the data specific to that item
     .then(function(quantityCheck) {
-        databaseQuery();
 
-        //if the user input quantity is less than or equal to the stock_quantity of them item, log purchase and update the database with the new quantity
-        if (quantityCheck.quantity <= res[i].stock_quantity) {
-            console.log("Congratulations! You just purchased: " + quantityCheck.quantity + " " + res[i].item_name + " for: $" + (res[i].price * quantityCheck.quantity));
-            updateQuantity();
+        databaseQuery(quantityCheck.item, quantityCheck.quantity);
 
-            //if the user quantity is more than the stock quantity, prompt for a new action
-        } else if (quantityCheck.quantity > res[i].stock_quantity) {
-            console.log("We're sorry, there is not enough of that item. What would you like to do?");
-            inquirer.prompt([{
-                    name: "action",
-                    type: "list",
-                    message: "Would you like to buy less of this item, buy a different item, or leave the store?",
-                    choices: ["buy less", "buy a different item", "leave store"]
-                }])
-                //depending on which choice the user picks, provide options for each
-                .then(function(nextSteps) {
+        //call the updateQuantity function to check the quantity available
+        updateQuantity(quantityCheck.quantity);
 
-                    //if the user wants to buy less, prompt them a new quantity
-                    if (nextSteps.action === "buy less") {
-                        inquirer.prompt([{
-                            name: "quantity",
-                            type: "input",
-                            message: "What how much/many would you like to buy?"
-                        }])
-
-                        //after taking the new quantity from the user, update the table
-                        .then(function(newPurchase) {
-                            updateQuantity();
-                        });
-                    } else if (nextSteps.action === "buy a different item") {
-                        userPrompt();
-                    } else {
-                        console.log("Thank you for shopping at Bamazon. Visit us again soon!");
-
-                        //exit the application
-                        return false;
-                    }
-                });
-        }
+    }).catch(function(e) {
+        console.log(e);
+        console.log(e.stack);
     });
 }
 
 //query the database and check if there are enough quantities of the database
-function databaseQuery() {
-    var quantityUpdate = connection.query("SELECT item_id,item_name,stock_quantity,price FROM products WHERE ?");
-    connection.query(quantityUpdate, { item_id: quantityCheck.item }, function(err, res) {
-        for (var i = 0; i < res.length; i++) {
-            console.log("ID: " + res[i].item_id + "Item: " + res[i].item_name + " || Quantity: " + res[i].stock_quantity + " || Price: $" + res[i].price);
+function databaseQuery(item_id, quantity) {
+
+    var quantityUpdate = "SELECT item_id,product_name,stock_quantity,price FROM products WHERE ?";
+    connection.query(quantityUpdate, { item_id: item_id }, function(err, res) {
+
+        //log the response for that item_id
+        console.log(res);
+
+        //if the user quantity is less than or equal to the stock quantity, run the updateQuantity function
+        if (quantity <= res[0].stock_quantity) {
+            updateQuantity(item_id, (res[0].stock_quantity - parseInt(quantity)));
+
+            //if the user quantity is more than the stock quantity, call the notEnoughQuantity function
+        } else if (quantity > res[0].stock_quantity) {
+            notEnoughQuantity();
         }
     });
 }
 
 //update the database with the number of quantity left
-function updateQuantity() {
+function updateQuantity(item_id, newQuantity) {
     connection.query("UPDATE products SET ? WHERE ?", [{
-        stock_quantity: (res[i].stock_quantity - quantityCheck.quantity)
+        stock_quantity: newQuantity
     }, {
-        item_name: quantityCheck.item
+        item_id: item_id
     }], function(err, res) {
+        if (err) {
+            console.log(err);
+        }
         //console log the number bought and the total price
-        console.log("Thanks for your purchase!");
-
+        console.log("Congratulations! You just purchased: " + quantity + " " + res[0].product_name + " for: $" + (res[0].price * parseInt(quantity)));
     });
+}
+
+//create a new function to handle if there isn't enough quantity
+function notEnoughQuantity() {
+    console.log("Insufficient quantity! We're sorry, there is not enough of that item. What would you like to do?");
+    inquirer.prompt([{
+            name: "action",
+            type: "list",
+            message: "Would you like to buy less of this item, buy a different item, or leave the store?",
+            choices: ["buy less", "buy a different item", "leave store"]
+        }])
+        //wait for the user response, and depending on which choice the user picks, provide additional options
+        .then(function(nextSteps) {
+
+            //if the user wants to buy less, prompt them a new quantity
+            if (nextSteps.action === "buy less") {
+                inquirer.prompt([{
+                    name: "quantity",
+                    type: "input",
+                    message: "What how much/many would you like to buy?"
+                }])
+
+                //wait for the user input, and then update the table
+                .then(function(newPurchase) {
+                    updateQuantity();
+                });
+
+                //if the user wants to buy a different item, reprompt them
+            } else if (nextSteps.action === "buy a different item") {
+                userPrompt();
+
+                //otherwise, log the message and exit the applicaton
+            } else {
+                console.log("Thank you for shopping at Bamazon. Visit us again soon!");
+                return false;
+            }
+        });
 }
