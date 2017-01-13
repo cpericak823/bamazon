@@ -76,7 +76,7 @@ function userPrompt() {
         databaseQuery(quantityCheck.item, quantityCheck.quantity);
 
         //call the updateQuantity function to check the quantity available
-        updateQuantity(quantityCheck.quantity);
+        updateQuantity(quantityCheck.item, quantityCheck.quantity);
 
         //catch any errors and log them
     }).catch(function(e) {
@@ -112,9 +112,8 @@ function databaseQuery(id, quantity) {
     });
 }
 
-//update the database with the number of quantity left
+//update the database with the number of quantity left using a promise
 function updateQuantity(item_id, newQuantity) {
-
     return new Promise(function(success, failure) {
         connection.query("UPDATE products SET ? WHERE ?", [{
             stock_quantity: newQuantity
@@ -129,7 +128,7 @@ function updateQuantity(item_id, newQuantity) {
     });
 }
 
-//create a new function to handle if there isn't enough quantity
+//a function designed to handle if there isn't enough quantity
 function notEnoughQuantity() {
     console.log("Insufficient quantity! We're sorry, there is not enough of that item. What would you like to do?");
     return inquirer.prompt([{
@@ -150,12 +149,5 @@ function notEnoughQuantity() {
                 console.log("Thank you for shopping at Bamazon. Visit us again soon!");
                 return;
             }
-        })
-
-    //wait for the user input, and then update the table
-    .then(function(newPurchase) {
-        updateQuantity();
-    }).catch(function(fail) {
-        console.log(fail);
-    });
+        });
 }
