@@ -5,3 +5,6 @@ Use: Take user input to query the Products database and allow the user to purchs
 See it in action:
 
 
+//format to embed images//
+![GitHub Logo](/images/logo.png)
+Format: ![Alt Text](url)
