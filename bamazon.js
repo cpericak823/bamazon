@@ -100,8 +100,8 @@ function databaseQuery(id, quantity) {
             if (quantity <= res[0].stock_quantity) {
                 updateQuantity(id, (res[0].stock_quantity - parseInt(quantity)));
 
-                //console log the number bought and the total price
-                console.log("Congratulations! You just purchased: " + quantity + " " + res[0].product_name + " for: $" + Math.ceil((res[0].price * parseInt(quantity)) * 100) / 100);
+                //console log the number bought and the total price to the nearest tenth
+                console.log("Congratulations! You just purchased: " + quantity + " " + res[0].product_name + " for: $" + ((res[0].price * parseInt(quantity)).toFixed(2)));
                 return;
 
                 //if the user quantity is more than the stock quantity, call the notEnoughQuantity function
