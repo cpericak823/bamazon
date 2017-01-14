@@ -1,14 +1,6 @@
 //require npm packages modules
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var prettyjson = require("prettyjson");
-
-//set the colors for the json object
-var jsonColor = {
-    keysColor: 'magenta',
-    stringColor: "cyan",
-    numberColor: "cyan"
-};
 
 
 //connect to mysql and once connected display the database
@@ -55,8 +47,9 @@ function showDatabase() {
             if (err) {
                 failure(err);
             } else {
-                console.log(prettyjson.render(res, jsonColor));
-
+                for (var i = 0; i < res.length; i++) {
+                    console.log(res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + " | " + res[i].price + " | " + res[i].stock_quantity);
+                }
                 success();
             }
         });
@@ -103,7 +96,10 @@ function databaseQuery(id, quantity) {
         connection.query(quantityUpdate, { item_id: id }, function(err, res) {
 
             //log the response for that item_id
-            console.log(res);
+            for (var i = 0; i < res.length; i++) {
+                console.log(res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + " | " + res[i].price + " | " + res[i].stock_quantity);
+            }
+
 
             //if the user quantity is less than or equal to the stock quantity, run the updateQuantity function
             if (quantity <= res[0].stock_quantity) {
