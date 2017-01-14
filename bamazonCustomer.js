@@ -1,6 +1,7 @@
 //require npm packages modules
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var table = require('console.table');
 
 
 //connect to mysql and once connected display the database
@@ -47,9 +48,7 @@ function showDatabase() {
             if (err) {
                 failure(err);
             } else {
-                for (var i = 0; i < res.length; i++) {
-                    console.log(res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + " | " + res[i].price + " | " + res[i].stock_quantity);
-                }
+                console.table(res);
                 success();
             }
         });
@@ -96,9 +95,7 @@ function databaseQuery(id, quantity) {
         connection.query(quantityUpdate, { item_id: id }, function(err, res) {
 
             //log the response for that item_id
-            for (var i = 0; i < res.length; i++) {
-                console.log(res[i].item_id + " | " + res[i].product_name + " | " + res[i].department_name + " | " + res[i].price + " | " + res[i].stock_quantity);
-            }
+            console.table(res);
 
 
             //if the user quantity is less than or equal to the stock quantity, run the updateQuantity function
@@ -107,7 +104,7 @@ function databaseQuery(id, quantity) {
 
                 //console log the number bought and the total price to the nearest tenth
                 console.log("Congratulations! You just purchased: " + quantity + " " + res[0].product_name + " for: $" + ((res[0].price * parseInt(quantity)).toFixed(2)));
-                return;
+                connection.end();
 
                 //if the user quantity is more than the stock quantity, call the notEnoughQuantity function
             } else if (quantity > res[0].stock_quantity) {
@@ -152,7 +149,7 @@ function notEnoughQuantity() {
                 //otherwise, log the message and exit the applicaton
             } else {
                 console.log("Thank you for shopping at Bamazon. Visit us again soon!");
-                return;
+                connection.end();
             }
         });
 }
