@@ -5,9 +5,9 @@ var prettyjson = require("prettyjson");
 
 //set the colors for the json object
 var jsonColor = {
-    keysColor: 'gray',
-    stringColor: "white",
-    numberColor: "white"
+    keysColor: 'magenta',
+    stringColor: "cyan",
+    numberColor: "cyan"
 };
 
 

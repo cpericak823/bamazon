@@ -14,14 +14,14 @@ primary key (item_id)
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUES 
 ("Canadian Goose Jacket", "Clothing", 600.00, 50),
-("Ugg Boots", "Shoes", 150.00, 100),
+("Ugg Boots", "Shoes", 150.25, 100),
 ("Northface Gloves", "Clothing", 24.99, 250),
 ("LuLu Lemon Leggings", "Clothing", 49.99, 75),
 ("Hot Hands", "Outdoor Recreation", 4.99, 1000),
-("Snowblower", "Patio, Lawn, and Garden", 1000.00, 25),
-("Swiss Miss K Cups", "Grocery", 12.50, 500),
+("Snowblower", "Patio, Lawn, and Garden", 999.99, 25),
+("Swiss Miss K Cups", "Grocery", 12.75, 500),
 ("EOS Lip Balm", "Beauty", 3.99, 125),
-("Heated Blanket", "Home", 35.00, 30),
-("Amazon Fire Stick", "Electronics", 50.00, 5000);
+("Heated Blanket", "Home", 35.25, 30),
+("Amazon Fire Stick", "Electronics", 50.75, 5000);
 
 select * from products;
