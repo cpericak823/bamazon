@@ -4,8 +4,9 @@
   "description": "an application that uses node js and mysql to query and update a database similar to amazon",
   "main": "bamazon.js",
   "dependencies": {
+    "inquirer": "^2.0.0",
     "mysql": "^2.12.0",
-    "inquirer": "^2.0.0"
+    "prettyjson": "^1.2.1"
   },
   "devDependencies": {},
   "scripts": {

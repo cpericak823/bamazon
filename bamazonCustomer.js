@@ -1,6 +1,14 @@
-//require mysql and inquirer modules
+//require npm packages modules
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var prettyjson = require("prettyjson");
+
+//set the colors for the json object
+var jsonColor = {
+    keysColor: 'gray',
+    stringColor: "white",
+    numberColor: "white"
+};
 
 
 //connect to mysql and once connected display the database
@@ -47,7 +55,8 @@ function showDatabase() {
             if (err) {
                 failure(err);
             } else {
-                console.log(res);
+                console.log(prettyjson.render(res, jsonColor));
+
                 success();
             }
         });
